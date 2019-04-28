@@ -59,6 +59,9 @@ public:
 
 private:
     
+    float mDelayTimeInSamples;
+    float mDelayReadHead;
+    
     int mCircularBufferWriteHead;
     int mCircularBufferLength;
 
