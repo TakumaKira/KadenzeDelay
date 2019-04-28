@@ -185,8 +185,8 @@ void KadenzeDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
             mDelayReadHead += mCircularBufferLength;
         }
         
-        buffer.setSample(0, i, mCircularBufferLeft[(int)mDelayReadHead]);
-        buffer.setSample(1, i, mCircularBufferRight[(int)mDelayReadHead]);
+        buffer.addSample(0, i, mCircularBufferLeft[(int)mDelayReadHead]);
+        buffer.addSample(1, i, mCircularBufferRight[(int)mDelayReadHead]);
 
         mCircularBufferWriteHead++;
         
