@@ -61,6 +61,8 @@ public:
 
 private:
     
+    float mDelayTimeSmoothed;
+    
     AudioParameterFloat* mDryWetParameter;
     AudioParameterFloat* mFeedbackParameter;
     AudioParameterFloat* mDelayTimeParameter;

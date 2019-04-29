@@ -42,6 +42,7 @@ KadenzeDelayAudioProcessor::KadenzeDelayAudioProcessor()
                                                                MAX_DELAY_TIME,
                                                                0.5));
     
+    mDelayTimeSmoothed = 0;
     mCircularBufferLeft = nullptr;
     mCircularBufferRight = nullptr;
     mCircularBufferWriteHead = 0;
@@ -145,6 +146,8 @@ void KadenzeDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     }
     
     mCircularBufferWriteHead = 0;
+    
+    mDelayTimeSmoothed = *mDelayTimeParameter;
 }
 
 void KadenzeDelayAudioProcessor::releaseResources()
@@ -192,13 +195,14 @@ void KadenzeDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
-    mDelayTimeInSamples = getSampleRate() * *mDelayTimeParameter;
-
     float* leftChannel = buffer.getWritePointer(0);
     float* rightChannel = buffer.getWritePointer(1);
     
     for (int i = 0; i < buffer.getNumSamples(); i++) {
         
+        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - *mDelayTimeParameter);
+        mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed;
+
         mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i] + mFeedbackLeft;
         mCircularBufferRight[mCircularBufferWriteHead] = rightChannel[i] + mFeedbackRight;
         
@@ -260,13 +264,16 @@ void KadenzeDelayAudioProcessor::setStateInformation (const void* data, int size
 }
 
 //==============================================================================
+// Added
+
+float KadenzeDelayAudioProcessor::lin_interp(float sample_x, float sample_x1, float inPhase)
+{
+    return (1 - inPhase) * sample_x + inPhase * sample_x1;
+}
+
+//==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new KadenzeDelayAudioProcessor();
-}
-
-float lin_interp(float sample_x, float sample_x1, float inPhase)
-{
-    return (1 - inPhase) * sample_x + inPhase * sample_x1;
 }
