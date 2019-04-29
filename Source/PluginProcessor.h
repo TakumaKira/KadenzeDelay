@@ -59,6 +59,8 @@ public:
 
 private:
     
+    float mDryWet;
+    
     float mFeedbackLeft;
     float mFeedbackRight;
     
