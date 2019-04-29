@@ -208,8 +208,16 @@ void KadenzeDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
             mDelayReadHead += mCircularBufferLength;
         }
         
-        float delay_sample_left = mCircularBufferLeft[(int)mDelayReadHead];
-        float delay_sample_right = mCircularBufferRight[(int)mDelayReadHead];
+        int readHead_x = (int)mDelayReadHead;
+        int readHead_x1 = readHead_x + 1;
+        float readHeadFloat = mDelayReadHead - readHead_x;
+        
+        if (readHead_x1 >= mCircularBufferLength) {
+            readHead_x1 -= mCircularBufferLength;
+        }
+        
+        float delay_sample_left = lin_interp(mCircularBufferLeft[readHead_x], mCircularBufferLeft[readHead_x1], readHeadFloat);
+        float delay_sample_right = lin_interp(mCircularBufferRight[readHead_x], mCircularBufferRight[readHead_x1], readHeadFloat);
         
         mFeedbackLeft = delay_sample_left * *mFeedbackParameter;
         mFeedbackRight = delay_sample_right * *mFeedbackParameter;
@@ -256,4 +264,9 @@ void KadenzeDelayAudioProcessor::setStateInformation (const void* data, int size
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new KadenzeDelayAudioProcessor();
+}
+
+float lin_interp(float sample_x, float sample_x1, float inPhase)
+{
+    return (1 - inPhase) * sample_x + inPhase * sample_x1;
 }
