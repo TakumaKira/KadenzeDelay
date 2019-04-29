@@ -137,11 +137,21 @@ void KadenzeDelayAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     
     mCircularBufferLength = sampleRate * MAX_DELAY_TIME;
     
+    if (mCircularBufferLeft != nullptr) {
+        delete [] mCircularBufferLeft;
+        mCircularBufferLeft = nullptr;
+    }
+    
     if (mCircularBufferLeft == nullptr) {
         mCircularBufferLeft = new float[mCircularBufferLength];
     }
     
     zeromem(mCircularBufferLeft, mCircularBufferLength * sizeof(float));
+    
+    if (mCircularBufferRight != nullptr) {
+        delete [] mCircularBufferRight;
+        mCircularBufferRight = nullptr;
+    }
     
     if (mCircularBufferRight == nullptr) {
         mCircularBufferRight = new float[mCircularBufferLength];
