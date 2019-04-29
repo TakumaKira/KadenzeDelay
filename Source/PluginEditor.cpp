@@ -46,6 +46,19 @@ KadenzeDelayAudioProcessorEditor::KadenzeDelayAudioProcessorEditor (KadenzeDelay
     mFeedbackSlider.onValueChange = [this, feedbackParameter] { *feedbackParameter = mFeedbackSlider.getValue(); };
     mFeedbackSlider.onDragStart = [feedbackParameter] { feedbackParameter->beginChangeGesture(); };
     mFeedbackSlider.onDragEnd = [feedbackParameter] { feedbackParameter->endChangeGesture(); };
+    
+    AudioParameterFloat* delayTimeParameter = (AudioParameterFloat*)params.getUnchecked(2);
+    
+    mDelayTimeSlider.setBounds(200, 0, 100, 100);
+    mDelayTimeSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+    mDelayTimeSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    mDelayTimeSlider.setRange(delayTimeParameter->range.start, delayTimeParameter->range.end);
+    mDelayTimeSlider.setValue(*delayTimeParameter);
+    addAndMakeVisible(mDelayTimeSlider);
+    
+    mDelayTimeSlider.onValueChange = [this, delayTimeParameter] { *delayTimeParameter = mDelayTimeSlider.getValue(); };
+    mDelayTimeSlider.onDragStart = [delayTimeParameter] { delayTimeParameter->beginChangeGesture(); };
+    mDelayTimeSlider.onDragEnd = [delayTimeParameter] { delayTimeParameter->endChangeGesture(); };
 }
 
 KadenzeDelayAudioProcessorEditor::~KadenzeDelayAudioProcessorEditor()
