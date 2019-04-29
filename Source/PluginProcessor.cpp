@@ -30,6 +30,9 @@ KadenzeDelayAudioProcessor::KadenzeDelayAudioProcessor()
     mCircularBufferLength = 0;
     mDelayTimeInSamples = 0;
     mDelayReadHead = 0;
+    
+    mFeedbackLeft = 0;
+    mFeedbackRight = 0;
 }
 
 KadenzeDelayAudioProcessor::~KadenzeDelayAudioProcessor()
@@ -176,8 +179,8 @@ void KadenzeDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
     
     for (int i = 0; i < buffer.getNumSamples(); i++) {
         
-        mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i];
-        mCircularBufferRight[mCircularBufferWriteHead] = rightChannel[i];
+        mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i] + mFeedbackLeft;
+        mCircularBufferRight[mCircularBufferWriteHead] = rightChannel[i] + mFeedbackRight;
         
         mDelayReadHead = mCircularBufferWriteHead - mDelayTimeInSamples;
         
@@ -185,11 +188,17 @@ void KadenzeDelayAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
             mDelayReadHead += mCircularBufferLength;
         }
         
-        buffer.addSample(0, i, mCircularBufferLeft[(int)mDelayReadHead]);
-        buffer.addSample(1, i, mCircularBufferRight[(int)mDelayReadHead]);
+        float delay_sample_left = mCircularBufferLeft[(int)mDelayReadHead];
+        float delay_sample_right = mCircularBufferRight[(int)mDelayReadHead];
+        
+        mFeedbackLeft = delay_sample_left * 0.8;
+        mFeedbackRight = delay_sample_right * 0.8;
 
         mCircularBufferWriteHead++;
         
+        buffer.addSample(0, i, delay_sample_left);
+        buffer.addSample(1, i, delay_sample_right);
+
         if (mCircularBufferWriteHead >= mCircularBufferLength) {
             mCircularBufferWriteHead = 0;
         }
