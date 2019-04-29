@@ -18,6 +18,21 @@ KadenzeDelayAudioProcessorEditor::KadenzeDelayAudioProcessorEditor (KadenzeDelay
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+    
+    auto& params = processor.getParameters();
+    
+    AudioParameterFloat* dryWetParameter = (AudioParameterFloat*)params.getUnchecked(0);
+    
+    mDryWetSlider.setBounds(0, 0, 100, 100);
+    mDryWetSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+    mDryWetSlider.setRange(dryWetParameter->range.start, dryWetParameter->range.end);
+    mDryWetSlider.setValue(*dryWetParameter);
+    addAndMakeVisible(mDryWetSlider);
+    
+    mDryWetSlider.onValueChange = [this, dryWetParameter] { *dryWetParameter = mDryWetSlider.getValue(); };
+    mDryWetSlider.onDragStart = [dryWetParameter] { dryWetParameter->beginChangeGesture(); };
+    mDryWetSlider.onDragEnd = [dryWetParameter] { dryWetParameter->endChangeGesture(); };
+
 }
 
 KadenzeDelayAudioProcessorEditor::~KadenzeDelayAudioProcessorEditor()
