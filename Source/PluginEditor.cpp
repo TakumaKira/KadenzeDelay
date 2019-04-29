@@ -25,6 +25,7 @@ KadenzeDelayAudioProcessorEditor::KadenzeDelayAudioProcessorEditor (KadenzeDelay
     
     mDryWetSlider.setBounds(0, 0, 100, 100);
     mDryWetSlider.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+    mDryWetSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     mDryWetSlider.setRange(dryWetParameter->range.start, dryWetParameter->range.end);
     mDryWetSlider.setValue(*dryWetParameter);
     addAndMakeVisible(mDryWetSlider);
